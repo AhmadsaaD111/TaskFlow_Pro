@@ -1,13 +1,13 @@
 # Contributing
 
-Thanks for your interest in contributing to TaskFlow Pro.
+I’m happy to review focused improvements to TaskFlow Pro.
 
 ## Guidelines
 
-- Keep changes focused and well-scoped.
-- Maintain the existing architectural patterns (feature modules, store/service separation).
-- Use TypeScript and the Vue 3 Composition API.
-- Run checks before opening a PR:
+- Keep changes small and well-scoped.
+- Follow the existing architecture (feature modules, store/service separation).
+- Use Vue 3 Composition API and TypeScript consistently.
+- Run the checks locally before opening a PR:
 
 ```bash
 npm run typecheck
@@ -16,6 +16,6 @@ npm run lint
 
 ## Pull Requests
 
-- Include a short description of the problem and the solution.
-- Add screenshots for UI changes.
-- Avoid unrelated refactors.
+- Explain the problem and why the change is worth it.
+- Include screenshots for any UI change.
+- Avoid drive-by refactors (especially across modules).
