@@ -99,3 +99,11 @@ Placeholders (add these images later):
 ---
 
 **License:** MIT
+
+---
+
+## ⭐ Like What You See?
+
+If this project helped you or inspired you, feel free to give it a ⭐.  
+Suggestions and constructive feedback are always appreciated.
+
