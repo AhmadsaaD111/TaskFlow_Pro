@@ -6,9 +6,9 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/<your-username>/taskflow-pro.git"
+    "url": "https://github.com/AhmadsaaD111/TaskFlow_Pro.git"
   },
-  "author": "<your-name>",
+  "author": "Ahmad (AhmadsaaD111)",
   "engines": {
     "node": ">=18"
   },
@@ -46,3 +46,4 @@
     "vue-tsc": "^2.0.19"
   }
 }
+
