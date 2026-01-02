@@ -1,13 +1,13 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
+This log tracks notable changes to TaskFlow Pro.
 
 ## 0.1.0
 
-- Initial public release of TaskFlow Pro.
-- Projects + Kanban task management.
-- RBAC (admin/member) with centralized permissions.
-- Activity log per project.
-- Search + filters.
-- Global error handling + toast notifications.
-- Mock REST API persisted in localStorage.
+- First public release.
+- Projects + task workflow with a Kanban board (drag & drop).
+- Role-based permissions (admin/member) enforced in UI and stores.
+- Per-project activity log for key actions.
+- Client-side search and filters for projects and tasks.
+- Centralized error handling surfaced via toast notifications.
+- Mock REST API persisted in `localStorage` for realistic flows without backend setup.
