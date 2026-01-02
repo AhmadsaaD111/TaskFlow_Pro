@@ -1,6 +1,8 @@
 # TaskFlow Pro
 
-TaskFlow Pro is a production-style project management SaaS frontend built with Vue 3 and TypeScript, designed to demonstrate real-world patterns like modular architecture, role-based permissions, audit-friendly activity tracking, and resilient UX with global error handling—all backed by a mocked REST API persisted in `localStorage`.
+TaskFlow Pro is a production-style project management SaaS frontend that I built to demonstrate how I structure and ship a real Vue 3 application: feature-first modules, typed API boundaries, role-based permissions enforced at multiple layers, and a UX that remains predictable under failure. It runs entirely client-side with a mocked REST API persisted in `localStorage`.
+
+**Author:** Ahmad — GitHub: **AhmadsaaD111**
 
 ## Key Features
 
@@ -39,12 +41,19 @@ TaskFlow Pro is a production-style project management SaaS frontend built with V
 
 ## Architecture Overview
 
-TaskFlow Pro follows a production-minded frontend architecture focused on maintainability and scale:
+TaskFlow Pro is intentionally structured like a real product codebase. The goal isn’t to show “how to use Vue”—it’s to show how I make a frontend easy to extend, test, and reason about.
 
-- **Feature-based modules**: domain code is organized under `src/modules/*` (auth, projects, tasks, users).
-- **Store/service separation**: Pinia stores orchestrate UI state + workflows; services encapsulate API calls.
-- **Centralized API layer**: a single HTTP client (`src/api/http.ts`) and a mock adapter (`src/api/mock/*`) provide consistent request/response handling.
-- **Defensive error handling**: typed API errors, runtime guards around unexpected shapes, and a global toast system to surface failures consistently.
+- **Feature modules** (`src/modules/*`): each domain owns its store, services, and UI.
+- **Store/service split**: Pinia stores model the application state and orchestration; services are the only layer that talks to the API.
+- **Single API surface**: `src/api/http.ts` normalizes errors and keeps request handling consistent.
+- **Mock backend with persistence**: the Axios mock adapter (`src/api/mock/*`) behaves like a REST API but persists to `localStorage`.
+- **Defensive UX**: unexpected response shapes and runtime errors are surfaced via a global toast system (no silent failures).
+
+### Trade-offs
+
+- The mock API keeps the project fully portable (no server setup), at the cost of not representing real latency/security concerns.
+- RBAC is enforced in the store layer for correctness and also in the UI for clarity—this duplication is intentional: the store is authoritative, and the UI prevents confusing affordances.
+- Activity logging is lightweight and intentionally scoped to high-signal events, not a full event-sourcing system.
 
 ## Folder Structure (high level)
 
@@ -83,7 +92,7 @@ Vite will print the local URL (typically `http://localhost:5173`).
 
 ## Screenshots
 
-Placeholders (add these images later):
+Add these images to the repo root (or update the paths if you prefer a `/docs` folder):
 
 - `dashboard.png`
 - `projects.png`
@@ -100,10 +109,12 @@ Placeholders (add these images later):
 
 **License:** MIT
 
+
 ---
 
 ## ⭐ Like What You See?
 
 If this project helped you or inspired you, feel free to give it a ⭐.  
 Suggestions and constructive feedback are always appreciated.
+
 
