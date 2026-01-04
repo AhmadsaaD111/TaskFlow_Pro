@@ -161,16 +161,6 @@ Email: member@taskflow.pro
 
 Password: Member123!
 
-Screenshots
-Add the following images to the repository root (or update paths if using a /docs folder):
-
-dashboard.png
-
-projects.png
-
-kanban.png
-
-activity-log.png
 
 Future Improvements
 Real backend integration (JWT + database)
@@ -184,5 +174,6 @@ MIT
 
 ⭐ Like what you see?
 If this project helped you or inspired you, feel free to give it a ⭐.
+
 
 
