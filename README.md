@@ -89,15 +89,7 @@ Vite will print the local URL (typically `http://localhost:5173`).
 
 - **Admin**: `admin@taskflow.pro` / `Admin123!`
 - **Member**: `member@taskflow.pro` / `Member123!`
-
-## Screenshots
-
-Add these images to the repo root (or update the paths if you prefer a `/docs` folder):
-
-- `dashboard.png`
-- `projects.png`
-- `kanban.png`
-- `activity-log.png`
+  
 
 ## Future Improvements
 
@@ -116,5 +108,6 @@ Add these images to the repo root (or update the paths if you prefer a `/docs` f
 
 If this project helped you or inspired you, feel free to give it a ⭐.  
 Suggestions and constructive feedback are always appreciated.
+
 
 
