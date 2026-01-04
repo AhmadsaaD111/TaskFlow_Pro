@@ -1,20 +1,32 @@
 # TaskFlow Pro
 
-TaskFlow Pro is a **production-style frontend architecture case study**.
+TaskFlow Pro is a **production-style frontend architecture case study** built with Vue 3 and TypeScript.
 
-I built it to demonstrate how I design and ship **maintainable, permission-aware client applications** with:
+The goal of this project is to demonstrate how I design and ship **maintainable, permission-aware single-page applications** with:
 
 - clear domain boundaries,
 - explicit authority layers,
 - predictable behavior under failure,
 - and frontend-enforced invariants that mirror real backend systems.
 
-Although the application runs entirely client-side using a mocked REST API persisted in `localStorage`, it is **intentionally structured as if it were backed by a real service**.  
-The focus of this project is **frontend system design**, not backend implementation.
+The application runs entirely client-side using a **persistent mocked REST API** implemented as an Axios adapter.  
+This allows the codebase to focus on **frontend system design and correctness** without requiring server setup.
 
 > ⚠️ Note  
-> This project uses a mocked REST API for portability and ease of review.  
-> The goal is to showcase frontend architecture, state modeling, and correctness — not server infrastructure.
+> The backend is intentionally mocked.  
+> The purpose of this project is to showcase frontend architecture, state modeling, and permission enforcement — not server infrastructure.
+
+---
+
+## What This Project Demonstrates
+
+TaskFlow Pro shows how to build a realistic SPA that:
+
+- Handles authentication and session persistence
+- Enforces RBAC (role-based access control) at multiple layers
+- Scales using feature-based modules with clear boundaries
+- Remains predictable under API and runtime failures
+- Mirrors backend-like constraints without coupling UI to storage details
 
 ---
 
@@ -24,124 +36,175 @@ The focus of this project is **frontend system design**, not backend implementat
 - Create and manage projects
 - Kanban board with drag & drop task workflow
 - Task fields: status, priority, due date, assignee
-- Mocked comments per task
+- Task comments (mocked, persisted)
 
 ### Role-Based Access Control (RBAC)
 - Admin / Member roles
-- Action-level permissions enforced in:
-  - Pinia store layer (authoritative)
-  - UI layer (preventing misleading affordances)
+- Permissions enforced at three levels:
+  - **Route-level** (navigation guards)
+  - **Store-level** (authoritative business rules)
+  - **UI-level** (preventing misleading affordances)
 
 ### Project Activity Log (Audit Trail)
-- Per-project activity feed persisted via the mock API
-- Tracks high-signal actions:
+- Per-project activity feed
+- Tracks high-signal events:
   - project creation
   - task creation
   - task movement
   - assignment changes
 
-### Search & Filters
-- Projects: search by name + status filter
-- Kanban: search by task title, assignee, and status
+### Search & Filtering
+- Project list: name search + status filter
+- Kanban board: task title, assignee, and status filters
 - Debounced inputs for responsive UX
 
-### Global Error Handling & Feedback
-- Centralized runtime + API error normalization
-- Errors surfaced as toast notifications
-- No silent failures
+### Error Handling & Feedback
+- Centralized API error normalization
+- Global toast notifications (no silent failures)
+- Inline page-level error states where appropriate
 
 ### Persistent Mock REST API
-- Full CRUD-style flows without backend setup
+- CRUD-style API behavior
 - Data persists across refreshes
-- Behaves like a REST API via Axios adapter
-
----
-
-## Tech Stack
-
-- Vue 3 (Composition API)
-- TypeScript
-- Pinia (state management)
-- Vue Router
-- Vite
-- Tailwind CSS
-- Axios (centralized API client)
-- Mock REST API (Axios adapter + `localStorage` persistence)
+- Backend-like validation, auth, and membership checks
 
 ---
 
 ## Architecture Overview
 
-TaskFlow Pro is structured to resemble a **real production frontend**, not a demo app.
+TaskFlow Pro is structured to resemble a **real production frontend**, not a demo or tutorial app.
 
-The structure mirrors how I expect a frontend to scale across features and teams, even when backed by complex backend systems.
+### High-level principles
 
-### Key architectural decisions
+- **Feature-first modules** (`src/modules/*`)
+- **Explicit API boundary** via a single HTTP client
+- **Stores as the authority** for business rules and permissions
+- **Services as thin API wrappers**
+- **UI as a consumer**, not a decision-maker
 
-- **Feature-first modules (`src/modules/*`)**  
-  Each domain owns its store, services, and UI.
+---
 
-- **Store / service split**  
-  Pinia stores model application state and orchestration.  
-  Services are the only layer allowed to communicate with the API.
+### Folder Structure (High Level)
 
-- **Single API surface**  
-  `src/api/http.ts` centralizes Axios configuration, error normalization, and response handling.
+src/
+├─ api/
+│ ├─ http.ts # centralized Axios client + error normalization
+│ └─ mock/ # Axios adapter + persistent localStorage DB
+│
+├─ components/
+│ └─ Base* + ToastHost
+│
+├─ layouts/
+│ ├─ AuthLayout.vue
+│ └─ DashboardLayout.vue
+│
+├─ modules/
+│ ├─ auth/ # auth store, permissions, login/register
+│ ├─ dashboard/ # dashboard view
+│ ├─ projects/ # projects domain (store, service, views)
+│ ├─ tasks/ # kanban + task domain
+│ ├─ users/ # admin-only user directory
+│ └─ system/ # system-level views (404)
+│
+├─ router/
+│ └─ index.ts # routes + auth/role guards
+│
+├─ store/
+│ ├─ toasts.ts # global toast store
+│ └─ theme.ts
+│
+├─ types/ # shared domain + API types
+├─ utils/ # debounce, id helpers, storage helpers
+└─ styles/
 
-- **Mock backend with persistence**  
-  The Axios mock adapter (`src/api/mock/*`) behaves like a REST API while persisting data to `localStorage`.
+markdown
+Copy code
 
-- **Defensive UX**  
-  Unexpected response shapes and runtime errors are surfaced via a global toast system — no silent failures.
+---
+
+## API & State Flow
+
+A typical flow looks like this:
+
+1. **UI** triggers a store action  
+   (e.g. `projects.fetchAll()`)
+
+2. **Store** enforces permissions and orchestration  
+   (e.g. `assertPermission('projects:read')`)
+
+3. **Service** calls the API client  
+   (thin wrapper around endpoint + payload)
+
+4. **API client** (`api/http.ts`)
+   - injects auth header
+   - retries transient failures
+   - normalizes errors into a consistent `ApiError` shape
+
+5. **Mock API adapter**
+   - enforces auth & membership
+   - validates inputs
+   - persists changes to `localStorage`
+
+6. **Store updates state**
+7. **UI reacts**
+
+Errors at any stage are surfaced consistently via global toasts and/or inline error UI.
+
+---
+
+## Permissions Model
+
+Permissions are enforced defensively at multiple layers:
+
+- **Route-level**
+  - `requiresAuth`, `roles` metadata
+  - redirects unauthenticated or unauthorized users
+
+- **Store-level (authoritative)**
+  - `assertPermission(...)` throws on forbidden actions
+  - prevents incorrect state transitions
+
+- **Mock backend**
+  - authentication checks
+  - project membership checks
+  - endpoint-level validation
+
+This mirrors how real systems enforce correctness while keeping UX clear.
 
 ---
 
 ## Trade-offs & Design Notes
 
-- The mocked API keeps the project **fully portable**, at the cost of not representing real latency or security concerns.
-- RBAC is enforced both in the store layer and the UI:
-  - the store is authoritative,
-  - the UI prevents confusing or misleading affordances.
-- Activity logging is intentionally scoped to **high-signal events**, not a full event-sourcing system.
+- The mock backend prioritizes **portability** over real security or latency.
+- RBAC is role-based, not attribute-based, to keep scope focused.
+- Optimistic UI is used selectively (e.g. task movement), with rollback on failure.
+- Global error surfacing reduces repetitive UI error code, while views still handle page-level failures explicitly.
 
-These trade-offs are deliberate and documented to keep the project focused on frontend system design.
+These trade-offs are deliberate and documented.
 
 ---
 
-## Folder Structure (High Level)
+## Tech Stack
 
-src/
-├─ api/
-│ ├─ http.ts # centralized Axios client + error normalization
-│ └─ mock/ # mocked REST API adapter + persisted mock DB
-│
-├─ modules/
-│ ├─ auth/ # auth store + RBAC permissions
-│ ├─ projects/ # project views, store, services
-│ ├─ tasks/ # kanban board + task modals, store, services
-│ └─ users/ # user directory (admin-only)
-│
-├─ store/
-│ └─ global stores (e.g. toast notifications)
-│
-├─ components/
-│ └─ reusable UI primitives + ToastHost
-│
-├─ router/
-│ └─ route definitions + auth guards
+### Frameworks
+- Vue 3
+- Vue Router
 
-yaml
-Copy code
+### State & Data
+- Pinia
+- Axios
+
+### Styling
+- Tailwind CSS
+
+### Tooling
+- Vite
+- TypeScript (strict mode)
+- ESLint + Prettier
 
 ---
 
 ## Getting Started
-
-### Prerequisites
-- Node.js 18+ (Vite 5 requirement)  
-  Tested with Node 20.
-
-### Run locally
 
 ```bash
 npm install
@@ -151,29 +214,18 @@ Vite will print the local URL (typically http://localhost:5173).
 Demo Accounts
 Admin
 
-Email: admin@taskflow.pro
-
-Password: Admin123!
+admin@taskflow.pro / Admin123!
 
 Member
 
-Email: member@taskflow.pro
-
-Password: Member123!
-
-
-Future Improvements
-Real backend integration (JWT + database)
-
-File attachments
-
-Notifications (in-app + email)
+member@taskflow.pro / Member123!
 
 License
 MIT
 
 ⭐ Like what you see?
 If this project helped you or inspired you, feel free to give it a ⭐.
+
 
 
 
